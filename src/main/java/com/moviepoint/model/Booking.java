@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * Represents a movie ticket booking with payment information
  */
 @Data
-@Entity
+// @Entity
 @Table(name = "bookings")
 public class Booking {
     @Id

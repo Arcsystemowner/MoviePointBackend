@@ -9,7 +9,7 @@ import java.util.Set;
  * Represents a movie with its details and shows
  */
 @Data
-@Entity
+// @Entity
 @Table(name = "movies")
 public class Movie {
     @Id
@@ -25,7 +25,7 @@ public class Movie {
     private Integer duration; // in minutes
     private Double rating;
     private String posterUrl;
-    
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MovieStatus status;

@@ -9,7 +9,7 @@ import java.util.Set;
  * Represents a screen in a theater with its seating arrangement
  */
 @Data
-@Entity
+// @Entity
 @Table(name = "screens")
 public class Screen {
     @Id
@@ -20,7 +20,7 @@ public class Screen {
     private String name;
 
     private Integer capacity;
-    
+
     @ManyToOne
     @JoinColumn(name = "theater_id", nullable = false)
     private Theater theater;

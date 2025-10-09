@@ -10,7 +10,7 @@ import java.util.Set;
  * Represents a movie show with its timing and pricing
  */
 @Data
-@Entity
+// @Entity
 @Table(name = "shows")
 public class Show {
     @Id

@@ -9,7 +9,7 @@ import java.util.Set;
  * Represents a user in the system with authentication and role information
  */
 @Data
-@Entity
+// @Entity
 @Table(name = "users")
 public class User {
     @Id

@@ -9,7 +9,7 @@ import java.util.Set;
  * Represents a movie theater with its screens and shows
  */
 @Data
-@Entity
+// @Entity
 @Table(name = "theaters")
 public class Theater {
     @Id
