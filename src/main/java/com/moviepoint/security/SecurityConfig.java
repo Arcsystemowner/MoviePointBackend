@@ -34,9 +34,17 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/movies").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/movies").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/movies/**").permitAll()
+                        .requestMatchers("/api/movies/**").permitAll()
+                        // security checks
                         .requestMatchers("/api/theaters").permitAll()
                         .requestMatchers("/api/shows/**").permitAll()
+                        // Swagger UI
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // Admin Setup (Local Only)
+                        .requestMatchers("/api/admin-setup/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

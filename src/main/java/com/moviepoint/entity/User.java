@@ -25,6 +25,9 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(nullable = false)
+    private String role = "ROLE_USER"; // Default role
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Booking> bookings = new HashSet<>();
 }

@@ -3,6 +3,8 @@ package com.moviepoint.controller;
 import com.moviepoint.dto.MovieRequest;
 import com.moviepoint.entity.Movie;
 import com.moviepoint.service.MovieService;
+import com.moviepoint.security.JwtTokenProvider;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,123 +44,129 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(MovieController.class) // Only load MovieController and web layer
 public class MovieControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc; // For simulating HTTP requests
+        @Autowired
+        private MockMvc mockMvc; // For simulating HTTP requests
 
-    @MockBean
-    private MovieService movieService; // Mock the service layer
+        @MockBean
+        private MovieService movieService; // Mock the service layer
 
-    @Autowired
-    private ObjectMapper objectMapper; // For JSON conversion
+        @MockBean
+        private JwtTokenProvider jwtTokenProvider; // Mock security dependency
 
-    private Movie testMovie;
-    private MovieRequest movieRequest;
+        @MockBean
+        private UserDetailsService userDetailsService; // Mock security dependency
 
-    @BeforeEach
-    void setUp() {
-        testMovie = new Movie();
-        testMovie.setId(1L);
-        testMovie.setTitle("Test Movie");
-        testMovie.setDescription("Test Description");
-        testMovie.setDuration("120 minutes");
-        testMovie.setGenre("Action");
-        testMovie.setLanguage("English");
-        testMovie.setReleaseDate("2025-09-23");
-        testMovie.setPosterUrl("http://example.com/poster.jpg");
+        @Autowired
+        private ObjectMapper objectMapper; // For JSON conversion
 
-        movieRequest = new MovieRequest();
-        movieRequest.setTitle("Test Movie");
-        movieRequest.setDescription("Test Description");
-        movieRequest.setDuration("120 minutes");
-        movieRequest.setGenre("Action");
-        movieRequest.setLanguage("English");
-        movieRequest.setReleaseDate("2025-09-23");
-        movieRequest.setPosterUrl("http://example.com/poster.jpg");
-    }
+        private Movie testMovie;
+        private MovieRequest movieRequest;
 
-    /**
-     * Test GET /api/movies endpoint
-     * Demonstrates:
-     * - Testing GET requests
-     * - Verifying JSON response
-     * - Checking HTTP status
-     */
-    @Test
-    void getAllMovies_ShouldReturnMoviesList() throws Exception {
-        when(movieService.getAllMovies())
-                .thenReturn(Arrays.asList(testMovie));
+        @BeforeEach
+        void setUp() {
+                testMovie = new Movie();
+                testMovie.setId(1L);
+                testMovie.setTitle("Test Movie");
+                testMovie.setDescription("Test Description");
+                testMovie.setDuration("120 minutes");
+                testMovie.setGenre("Action");
+                testMovie.setLanguage("English");
+                testMovie.setReleaseDate("2025-09-23");
+                testMovie.setPosterUrl("http://example.com/poster.jpg");
 
-        mockMvc.perform(get("/api/movies"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].title").value(testMovie.getTitle()))
-                .andExpect(jsonPath("$[0].genre").value(testMovie.getGenre()));
-    }
+                movieRequest = new MovieRequest();
+                movieRequest.setTitle("Test Movie");
+                movieRequest.setDescription("Test Description");
+                movieRequest.setDuration("120 minutes");
+                movieRequest.setGenre("Action");
+                movieRequest.setLanguage("English");
+                movieRequest.setReleaseDate("2025-09-23");
+                movieRequest.setPosterUrl("http://example.com/poster.jpg");
+        }
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    void createMovie_WithValidData_ShouldReturnCreatedMovie() throws Exception {
-        when(movieService.createMovie(any(MovieRequest.class)))
-                .thenReturn(testMovie);
+        /**
+         * Test GET /api/movies endpoint
+         * Demonstrates:
+         * - Testing GET requests
+         * - Verifying JSON response
+         * - Checking HTTP status
+         */
+        @Test
+        void getAllMovies_ShouldReturnMoviesList() throws Exception {
+                when(movieService.getAllMovies())
+                                .thenReturn(Arrays.asList(testMovie));
 
-        mockMvc.perform(post("/api/movies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(movieRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value(testMovie.getTitle()))
-                .andExpect(jsonPath("$.genre").value(testMovie.getGenre()));
-    }
+                mockMvc.perform(get("/api/movies"))
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(jsonPath("$[0].title").value(testMovie.getTitle()))
+                                .andExpect(jsonPath("$[0].genre").value(testMovie.getGenre()));
+        }
 
-    @Test
-    void getMovieById_WithValidId_ShouldReturnMovie() throws Exception {
-        when(movieService.getMovieById(1L))
-                .thenReturn(testMovie);
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void createMovie_WithValidData_ShouldReturnCreatedMovie() throws Exception {
+                when(movieService.createMovie(any(MovieRequest.class)))
+                                .thenReturn(testMovie);
 
-        mockMvc.perform(get("/api/movies/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(testMovie.getId()))
-                .andExpect(jsonPath("$.title").value(testMovie.getTitle()));
-    }
+                mockMvc.perform(post("/api/movies")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(movieRequest)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.title").value(testMovie.getTitle()))
+                                .andExpect(jsonPath("$.genre").value(testMovie.getGenre()));
+        }
 
-    @Test
-    void getMoviesByLanguage_ShouldReturnMoviesList() throws Exception {
-        when(movieService.getMoviesByLanguage("English"))
-                .thenReturn(Arrays.asList(testMovie));
+        @Test
+        void getMovieById_WithValidId_ShouldReturnMovie() throws Exception {
+                when(movieService.getMovieById(1L))
+                                .thenReturn(testMovie);
 
-        mockMvc.perform(get("/api/movies/language/English"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].language").value(testMovie.getLanguage()));
-    }
+                mockMvc.perform(get("/api/movies/1"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(testMovie.getId()))
+                                .andExpect(jsonPath("$.title").value(testMovie.getTitle()));
+        }
 
-    @Test
-    void getMoviesByGenre_ShouldReturnMoviesList() throws Exception {
-        when(movieService.getMoviesByGenre("Action"))
-                .thenReturn(Arrays.asList(testMovie));
+        @Test
+        void getMoviesByLanguage_ShouldReturnMoviesList() throws Exception {
+                when(movieService.getMoviesByLanguage("English"))
+                                .thenReturn(Arrays.asList(testMovie));
 
-        mockMvc.perform(get("/api/movies/genre/Action"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].genre").value(testMovie.getGenre()));
-    }
+                mockMvc.perform(get("/api/movies/language/English"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].language").value(testMovie.getLanguage()));
+        }
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    void deleteMovie_WithValidId_ShouldReturnSuccess() throws Exception {
-        mockMvc.perform(delete("/api/movies/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Movie deleted successfully"));
-    }
+        @Test
+        void getMoviesByGenre_ShouldReturnMoviesList() throws Exception {
+                when(movieService.getMoviesByGenre("Action"))
+                                .thenReturn(Arrays.asList(testMovie));
 
-    @Test
-    void createMovie_WithoutAdminRole_ShouldReturnForbidden() throws Exception {
-        mockMvc.perform(post("/api/movies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(movieRequest)))
-                .andExpect(status().isForbidden());
-    }
+                mockMvc.perform(get("/api/movies/genre/Action"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].genre").value(testMovie.getGenre()));
+        }
 
-    @Test
-    void deleteMovie_WithoutAdminRole_ShouldReturnForbidden() throws Exception {
-        mockMvc.perform(delete("/api/movies/1"))
-                .andExpect(status().isForbidden());
-    }
+        @Test
+        @WithMockUser(username = "admin", roles = "ADMIN")
+        void deleteMovie_WithValidId_ShouldReturnSuccess() throws Exception {
+                mockMvc.perform(delete("/api/movies/1"))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Movie deleted successfully"));
+        }
+
+        @Test
+        void createMovie_WithoutAdminRole_ShouldReturnForbidden() throws Exception {
+                mockMvc.perform(post("/api/movies")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(movieRequest)))
+                                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void deleteMovie_WithoutAdminRole_ShouldReturnForbidden() throws Exception {
+                mockMvc.perform(delete("/api/movies/1"))
+                                .andExpect(status().isForbidden());
+        }
 }
