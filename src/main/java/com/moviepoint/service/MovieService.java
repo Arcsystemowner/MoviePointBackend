@@ -15,6 +15,9 @@ public class MovieService {
 
     @Transactional
     public Movie createMovie(MovieRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("MovieRequest must not be null");
+        }
         Movie movie = new Movie();
         movie.setTitle(request.getTitle());
         movie.setDescription(request.getDescription());

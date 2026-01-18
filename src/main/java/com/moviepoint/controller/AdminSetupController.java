@@ -1,6 +1,7 @@
 package com.moviepoint.controller;
 
 import com.moviepoint.entity.User;
+import com.moviepoint.entity.UserRole;
 import com.moviepoint.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class AdminSetupController {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole("ROLE_ADMIN");
+        user.setRole(com.moviepoint.entity.UserRole.ROLE_ADMIN);
         userRepository.save(user);
 
         return ResponseEntity.ok("Admin created successfully");
@@ -48,13 +49,15 @@ public class AdminSetupController {
             return ResponseEntity.badRequest().body("User not found");
         }
 
-        if (!"ROLE_ADMIN".equals(existingUser.getRole())) {
+        if (!com.moviepoint.entity.UserRole.ROLE_ADMIN.equals(existingUser.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Can only edit admins via this API");
         }
 
         // Update fields
-        if (user.getName() != null) existingUser.setName(user.getName());
-        if (user.getPhoneNumber() != null) existingUser.setPhoneNumber(user.getPhoneNumber());
+        if (user.getName() != null)
+            existingUser.setName(user.getName());
+        if (user.getPhoneNumber() != null)
+            existingUser.setPhoneNumber(user.getPhoneNumber());
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         }

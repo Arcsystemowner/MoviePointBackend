@@ -62,6 +62,12 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- H2 for local smoke tests -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+
     <!-- JWT Dependencies -->
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
@@ -97,6 +103,19 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Testcontainers for integration tests -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>1.19.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>1.19.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

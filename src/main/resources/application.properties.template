@@ -1,0 +1,17 @@
+# Database
+spring.datasource.url=jdbc:postgresql://localhost:5432/moviepoint
+spring.datasource.username=postgres
+spring.datasource.password=your_db_password
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+
+# Server
+server.port=8080
+
+# JWT
+jwt.secret=replace_with_secure_random_string
+jwt.expiration-ms=3600000
+
+# Other
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true

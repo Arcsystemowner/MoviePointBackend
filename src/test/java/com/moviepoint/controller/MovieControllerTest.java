@@ -8,7 +8,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -41,7 +43,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * - Replaces real service with mock
  * - Allows controlling service behavior
  */
-@WebMvcTest(MovieController.class) // Only load MovieController and web layer
+@SpringBootTest
+@AutoConfigureMockMvc
 public class MovieControllerTest {
 
         @Autowired
@@ -92,6 +95,7 @@ public class MovieControllerTest {
          * - Checking HTTP status
          */
         @Test
+        @WithMockUser
         void getAllMovies_ShouldReturnMoviesList() throws Exception {
                 when(movieService.getAllMovies())
                                 .thenReturn(Arrays.asList(testMovie));
@@ -118,6 +122,7 @@ public class MovieControllerTest {
         }
 
         @Test
+        @WithMockUser
         void getMovieById_WithValidId_ShouldReturnMovie() throws Exception {
                 when(movieService.getMovieById(1L))
                                 .thenReturn(testMovie);
@@ -129,6 +134,7 @@ public class MovieControllerTest {
         }
 
         @Test
+        @WithMockUser
         void getMoviesByLanguage_ShouldReturnMoviesList() throws Exception {
                 when(movieService.getMoviesByLanguage("English"))
                                 .thenReturn(Arrays.asList(testMovie));
@@ -139,6 +145,7 @@ public class MovieControllerTest {
         }
 
         @Test
+        @WithMockUser
         void getMoviesByGenre_ShouldReturnMoviesList() throws Exception {
                 when(movieService.getMoviesByGenre("Action"))
                                 .thenReturn(Arrays.asList(testMovie));
@@ -157,6 +164,7 @@ public class MovieControllerTest {
         }
 
         @Test
+        @WithMockUser(roles = "USER")
         void createMovie_WithoutAdminRole_ShouldReturnForbidden() throws Exception {
                 mockMvc.perform(post("/api/movies")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -165,6 +173,7 @@ public class MovieControllerTest {
         }
 
         @Test
+        @WithMockUser(roles = "USER")
         void deleteMovie_WithoutAdminRole_ShouldReturnForbidden() throws Exception {
                 mockMvc.perform(delete("/api/movies/1"))
                                 .andExpect(status().isForbidden());
