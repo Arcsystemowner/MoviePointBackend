@@ -28,8 +28,8 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "user_role")
+    @Convert(converter = UserRoleConverter.class)
     private UserRole role = UserRole.ROLE_USER; // Default role
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
